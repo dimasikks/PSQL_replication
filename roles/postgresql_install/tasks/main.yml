@@ -1,0 +1,43 @@
+---
+- name: TAKE DIST NAME
+  ansible.builtin.shell:
+    cmd: lsb_release -cs | awk {'print $1'}
+  register: dist
+
+- name: ADDING SIGN KEY
+  become: true
+  ansible.builtin.apt_key:
+    url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+    state: present
+
+- name: ADDING DEB SOURCE
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt {{ dist.stdout }}-pgdg main"
+    state: present
+
+- name: UPDATE PACKAGES && INSTALL POSTGRESQL
+  become: true
+  ansible.builtin.apt:
+    name: postgresql-{{ version }}
+    state: present
+
+- name: ENABLE POSTGRESQL
+  become: true
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: CHECK POSTGRESQL VERSION 
+  ansible.builtin.shell:
+    cmd: psql --version
+  register: psql_version
+
+- name: POSTGRESQL INFO
+  ansible.builtin.debug:
+    msg: "{{ psql_version.stdout }}"
+
+- name: INSTALLATION FINISHED
+  ansible.builtin.pause:
+    seconds: 3

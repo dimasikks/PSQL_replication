@@ -1,0 +1,38 @@
+---
+- name: CHECK IF REPLICATION USER EXISTS
+  become: true
+  ansible.builtin.shell: sudo -u postgres psql -c "\du;" | grep {{ repl_user }} | wc -l
+  register: check_user
+  ignore_errors: yes
+
+- name: CREATE USER FOR REPLICATION
+  become: true
+  ansible.builtin.shell: sudo -u postgres psql -c "CREATE USER {{ repl_user }} WITH REPLICATION ENCRYPTED PASSWORD '{{ repl_password }}';"
+  when: check_user == "0"
+
+- name: EDITING POSTGRESQL.CONF
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/{{ version }}/main/postgresql.conf
+    regexp: '^[#\s]*{{ item.split()[0] }}'
+    line: '{{ item }}'
+  loop: "{{ postgres_conf }}"
+  
+- name: EDITING PG_HBA.CONF
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/{{ version }}/main/pg_hba.conf
+    regexp: '^host replication {{ repl_user }} {{ hostvars[item].ansible_host }}'
+    line: 'host replication {{ repl_user }} {{ hostvars[item].ansible_host }} scram-sha-256'
+  loop: "{{ groups['slave_hosts'] }}"
+
+- name: RESTART POSTGRES
+  become: true
+  ansible.builtin.systemd:
+    name: postgresql
+    state: restarted
+
+- name: CONFIGURATION OF MASTER SERVER FINISHED
+  ansible.builtin.pause:
+    seconds: 3
+  

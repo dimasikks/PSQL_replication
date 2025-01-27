@@ -1,0 +1,22 @@
+all:
+  children:
+    master_host:
+      hosts:
+        host_1:
+          ansible_user: dmitry
+          ansible_password: dima2004
+          ansible_host: 127.0.0.1
+    slave_hosts:
+      hosts:
+        host_2:
+          ansible_user: dmitry  
+          ansible_password: dima2004
+          ansible_host: 192.168.10.10
+        host_3:
+          ansible_user: dmitry  
+          ansible_password: dima2004
+          ansible_host: 192.168.10.11
+        host_4:
+          ansible_user: dmitry  
+          ansible_password: dima2004
+          ansible_host: 192.168.10.12
