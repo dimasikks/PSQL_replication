@@ -3,20 +3,22 @@ all:
     master_host:
       hosts:
         host_1:
-          ansible_user: dmitry
-          ansible_password: dima2004
-          ansible_host: 127.0.0.1
+          ansible_user: dkashitsyn
+          ansible_password: dimaliga1604!
+          ansible_host: 10.22.1.43
+          ansible_become_password: dimaliga1604!
     slave_hosts:
       hosts:
         host_2:
-          ansible_user: dmitry  
-          ansible_password: dima2004
-          ansible_host: 192.168.10.10
-        host_3:
-          ansible_user: dmitry  
-          ansible_password: dima2004
-          ansible_host: 192.168.10.11
-        host_4:
-          ansible_user: dmitry  
-          ansible_password: dima2004
-          ansible_host: 192.168.10.12
+          ansible_user:  user
+          ansible_password: crjhjcnm
+          ansible_host: 172.24.160.106
+          ansible_become_password: crjhjcnm
+        # host_3:
+        #   ansible_user: 
+        #   ansible_password: 
+        #   ansible_host: 
+        # host_4:
+        #   ansible_user: 
+        #   ansible_password: 
+        #   ansible_host: 

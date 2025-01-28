@@ -1,2 +1,36 @@
 ---
-# tasks file for postgresql_replication_slave
+#- name: CHECK REPLICATION
+
+
+
+- name: UPDATE LOCALES
+  become: true
+  ansible.builtin.shell: locale-gen ru_RU.utf8 ru_UA.utf8 && update-locale
+
+- name: STOP POSTGRES
+  become: true
+  ansible.builtin.systemd:
+    name: postgresql
+    state: stopped
+
+- name: EDITING POSTGRESQL.CONF
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/{{ version }}/main/postgresql.conf
+    regexp: '^[#\s]*{{ item.split()[0] }}'
+    line: '{{ item }}'
+  loop: "{{ postgres_conf_slave }}"
+
+- name: CLEAR OLD FILES | WARNING | IF ITS FIRST INSTALLATION, MAKE BACKUP IF ITS NOT
+  become: true
+  ansible.builtin.shell: "rm -rf /var/lib/postgresql/{{ version }}/main/*"
+
+- name: CHECK REPLICATION WORK
+  become: true
+  ansible.builtin.shell: "sudo -u postgres PGPASSWORD={{ repl_password }} pg_basebackup -R -h {{ hostvars['host_1'].ansible_host }} -U {{ repl_user }} -D /var/lib/postgresql/{{ version }}/main -P"
+
+- name: START POSTGRES
+  become: true
+  ansible.builtin.systemd:
+    name: postgresql
+    state: restarted

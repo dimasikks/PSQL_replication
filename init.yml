@@ -1,14 +1,20 @@
 - name: INSTALL POSTGRES
-  hosts: master_host:host_1
+  hosts: all
   gather_facts: false
   roles:
     - role: postgresql_install
       tags: [ postgresql_install ]
 
 - name: CONFIGURE MASTER SERVER
-  hosts: master_host:host_1
+  hosts: master_host
   gather_facts: false
   roles:
     - role: postgresql_replication_master
       tags: [ postgresql_replication_master ]
 
+- name: CONFIGURE SLAVE SERVERS
+  hosts: slave_hosts
+  gather_facts: false
+  roles:
+    - role: postgresql_replication_slave
+      tags: [ postgresql_replication_slave ]
