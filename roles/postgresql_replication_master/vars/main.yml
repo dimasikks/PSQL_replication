@@ -2,11 +2,12 @@
 version: 16
 repl_user: replication_user
 repl_password: replication_user_password
+postgresql_archive: /oracle/pg_data/archive/
 postgres_conf_master:
   - listen_addresses = '*'
   - max_connections = 110
   - archive_mode = on
-  - archive_command = 'cp %p /oracle/pg_data/archive/%f' 
+  - archive_command = 'cp %p {{ postgresql_archive }}%f' 
   - max_wal_senders = 10                 
   - wal_level = replica                     
   - wal_log_hints = on       

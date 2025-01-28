@@ -1,0 +1,31 @@
+---
+- name: CHECK REPLICATION AT MASTER SERVER
+  become: true
+  ansible.builtin.shell: sudo -u postgres psql -c "select * from pg_stat_replication;" | grep row | tr -d "()" | awk '{print $1}'
+  register: master_result
+  when: "'master_host' in group_names"
+
+- name: RESULT MASTER SERVER
+  ansible.builtin.debug:
+    msg: "REPLICATION: {{ ( master_result.stdout != '0' ) | ternary('OK', 'NOT OK') }}"
+  when: "'master_host' in group_names"
+
+- name: WAITING . . .
+  ansible.builtin.pause:
+    seconds: 3
+
+- name: CHECK REPLICATION AT SLAVE SERVER
+  become: true
+  ansible.builtin.shell: sudo -u postgres psql -c "select * from pg_stat_wal_receiver;" | grep row | tr -d "()" | awk '{print $1}'
+  register: slave_result
+  when: "'slave_hosts' in group_names"
+
+- name: Get slave results from all hosts
+  ansible.builtin.debug:
+    msg: "REPLICATION: {{ ( hostvars[item].slave_result != '0' ) | ternary('OK', 'NOT OK') }}"
+  with_items: "{{ groups['slave_hosts'] }}"
+  when: "'slave_hosts' in group_names"
+
+- name: WAITING . . .
+  ansible.builtin.pause:
+    seconds: 3

@@ -10,6 +10,10 @@
   ansible.builtin.shell: sudo -u postgres psql -c "CREATE USER {{ repl_user }} WITH REPLICATION ENCRYPTED PASSWORD '{{ repl_password }}';"
   when: check_user.stdout == "0"
 
+- name: CREATE DIRECTORIES FOR ARCHIVE | IF CONFIGURED ELSE SKIP ERRORS
+  become: true
+  ansible.builtin.shell: "mkdir -p {{ postgresql_archive }} && chown -R postgres:postgres /$(echo {{ postgresql_archive }} | tr '/' ' ' | awk '{print $1}')"
+
 - name: EDITING POSTGRESQL.CONF
   become: true
   ansible.builtin.lineinfile:

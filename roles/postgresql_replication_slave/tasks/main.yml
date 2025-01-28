@@ -1,9 +1,5 @@
 ---
-#- name: CHECK REPLICATION
-
-
-
-- name: UPDATE LOCALES
+- name: UPDATE LOCALES && LOAD LOCALES | MANUALLY CONFIGURE TASK IF ERRORS APPEARS
   become: true
   ansible.builtin.shell: locale-gen ru_RU.utf8 ru_UA.utf8 && update-locale
 
@@ -34,3 +30,7 @@
   ansible.builtin.systemd:
     name: postgresql
     state: restarted
+
+- name: CONFIGURATION OF MASTER SERVER FINISHED
+  ansible.builtin.pause:
+    seconds: 3

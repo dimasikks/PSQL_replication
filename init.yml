@@ -18,3 +18,10 @@
   roles:
     - role: postgresql_replication_slave
       tags: [ postgresql_replication_slave ]
+
+- name: CHECK REPLICATION
+  hosts: all
+  gather_facts: false
+  roles:
+    - role: replication_check
+      tags: [ replication_check ]
