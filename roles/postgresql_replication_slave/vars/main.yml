@@ -1,7 +1,0 @@
----
-version: 16
-repl_user: replication_user
-repl_password: replication_user_password
-postgres_conf_slave:
-  - listen_addresses = '*'
-  - max_connections = 110

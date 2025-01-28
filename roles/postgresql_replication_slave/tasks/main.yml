@@ -17,15 +17,30 @@
     line: '{{ item }}'
   loop: "{{ postgres_conf_slave }}"
 
-- name: CLEAR OLD FILES | WARNING | IF ITS FIRST INSTALLATION, MAKE BACKUP IF ITS NOT
+- name: "|===================================| WARNING |===================================|"
+  ansible.builtin.pause:
+    prompt: "Next command will delete ALL files at /var/lib/postgresql/{{ version }}/main/. Make sure you made backup. You wanna continue? (y/n)"
+  register: confirmation
+
+- name: SHUT DOWN
+  meta: end_play
+  when: "confirmation.user_input.lower() not in ['y', 'yes']"
+
+- name: CLEAR OLD FILES
   become: true
   ansible.builtin.shell: "rm -rf /var/lib/postgresql/{{ version }}/main/*"
+
+- name: START POSTGRES (1)
+  become: true
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
 
 - name: CHECK REPLICATION WORK
   become: true
   ansible.builtin.shell: "sudo -u postgres PGPASSWORD={{ repl_password }} pg_basebackup -R -h {{ hostvars['host_1'].ansible_host }} -U {{ repl_user }} -D /var/lib/postgresql/{{ version }}/main -P"
 
-- name: START POSTGRES
+- name: START POSTGRES (2)
   become: true
   ansible.builtin.systemd:
     name: postgresql

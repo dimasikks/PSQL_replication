@@ -10,4 +10,7 @@ postgres_conf_master:
   - archive_command = 'cp %p {{ postgresql_archive }}%f' 
   - max_wal_senders = 10                 
   - wal_level = replica                     
-  - wal_log_hints = on       
+  - wal_log_hints = on
+postgres_conf_slave:
+  - listen_addresses = '*'
+  - max_connections = 110       
